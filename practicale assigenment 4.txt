@@ -1,0 +1,624 @@
+1.write a spring hibernate program for working with hibernate using hibernate.cfg.fille
+
+Pom.XML
+
+<dependencies>
+    <!-- Spring Context -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Spring ORM (for Hibernate integration) -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Hibernate Core -->
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>5.6.15.Final</version>
+    </dependency>
+
+    <!-- Database Driver (PostgreSQL example) -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.3</version>
+    </dependency>
+</dependencies>
+
+
+Hibernate.cfg.xml
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database connection -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/mydb</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">admin</property>
+
+        <!-- Hibernate properties -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+
+        <!-- Mapping -->
+        <mapping class="com.example.model.Employee"/>
+    </session-factory>
+</hibernate-configuration>
+
+Employee.Java
+
+package com.example.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="employee")
+public class Employee {
+    @Id
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", salary=" + salary + "]";
+    }
+}
+
+applicationContext.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Employee DAO -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
+
+
+EmployeeDAO.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+
+public interface EmployeeDAO {
+    void saveEmployee(Employee emp);
+    Employee getEmployee(int id);
+}
+
+
+Employee Daoimpl
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.hibernate.SessionFactory;
+import org.hibernate.Session;
+import org.springframework.transaction.annotation.Transactional;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private SessionFactory sessionFactory;
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    @Transactional
+    public void saveEmployee(Employee emp) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(emp);
+        System.out.println("Employee Saved: " + emp);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Employee getEmployee(int id) {
+        Session session = sessionFactory.getCurrentSession();
+        return session.get(Employee.class, id);
+    }
+}
+
+Main.java
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Create Employee
+        Employee emp = new Employee();
+        emp.setId(1);
+        emp.setName("Ali");
+        emp.setSalary(50000);
+
+        // Save
+        dao.saveEmployee(emp);
+
+        // Fetch
+        Employee fetched = dao.getEmployee(1);
+        System.out.println("Fetched: " + fetched);
+    }
+}
+
+
+2.write a spring hibernate program by using HibernateTempllate class.
+
+Pom.XML
+
+
+<dependencies>
+    <!-- Spring Context -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Spring ORM -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Hibernate Core -->
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>5.6.15.Final</version>
+    </dependency>
+
+    <!-- Database Driver (PostgreSQL example) -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.3</version>
+    </dependency>
+</dependencies>
+
+Hibernate.cfg.XML
+
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- DB connection -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/mydb</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">admin</property>
+
+        <!-- Hibernate properties -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+
+        <!-- Entity Mapping -->
+        <mapping class="com.example.model.Employee"/>
+    </session-factory>
+</hibernate-configuration>
+
+Employee.java
+
+package com.example.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="employee")
+public class Employee {
+    @Id
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters/setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", salary=" + salary + "]";
+    }
+}
+
+applicationContext.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- SessionFactory from Hibernate config -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    </bean>
+
+    <!-- HibernateTemplate -->
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- DAO Bean -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="hibernateTemplate" ref="hibernateTemplate"/>
+    </bean>
+</beans>
+
+EmployeeDAO.java
+
+
+package com.example.dao;
+
+import com.example.model.Employee;
+
+public interface EmployeeDAO {
+    void saveEmployee(Employee emp);
+    Employee getEmployee(int id);
+}
+
+EmployeeDaoimpl
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private HibernateTemplate hibernateTemplate;
+
+    // setter injection
+    public void setHibernateTemplate(HibernateTemplate hibernateTemplate) {
+        this.hibernateTemplate = hibernateTemplate;
+    }
+
+    @Override
+    @Transactional
+    public void saveEmployee(Employee emp) {
+        hibernateTemplate.save(emp);
+        System.out.println("Saved Employee: " + emp);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Employee getEmployee(int id) {
+        return hibernateTemplate.get(Employee.class, id);
+    }
+}
+
+Main.java
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Create employee
+        Employee emp = new Employee();
+        emp.setId(1);
+        emp.setName("Ali");
+        emp.setSalary(60000);
+
+        // Save employee
+        dao.saveEmployee(emp);
+
+        // Fetch employee
+        Employee fetched = dao.getEmployee(1);
+        System.out.println("Fetched: " + fetched);
+    }
+}
+
+
+
+3.write a spring hibernate program for HibernateTransaction management using CRUD operation
+Pom.XML
+
+
+<dependencies>
+    <!-- Spring Context -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Spring ORM (Hibernate integration) -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Hibernate -->
+    <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>5.6.15.Final</version>
+    </dependency>
+
+    <!-- Database Driver (PostgreSQL example) -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.3</version>
+    </dependency>
+</dependencies>
+
+Hibernate.cfg.XML
+
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- DB Connection -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/mydb</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">admin</property>
+
+        <!-- Hibernate Settings -->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="show_sql">true</property>
+
+        <!-- Entity Mapping -->
+        <mapping class="com.example.model.Employee"/>
+    </session-factory>
+</hibernate-configuration>
+
+Employee.java
+
+package com.example.model;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="employee")
+public class Employee {
+    @Id
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters & setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", salary=" + salary + "]";
+    }
+}
+
+applicarionContext.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx 
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    </bean>
+
+    <!-- Transaction Manager -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Enable annotation-driven transaction -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- DAO Bean -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>
+
+EmployeeDAO.java 
+package com.example.dao;
+
+import com.example.model.Employee;
+import java.util.List;
+
+public interface EmployeeDAO {
+    void saveEmployee(Employee emp);
+    Employee getEmployee(int id);
+    void updateEmployee(Employee emp);
+    void deleteEmployee(int id);
+    List<Employee> getAllEmployees();
+}
+
+EmployeeDaoimpl.Java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private SessionFactory sessionFactory;
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    private Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
+
+    @Override
+    @Transactional
+    public void saveEmployee(Employee emp) {
+        getSession().save(emp);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Employee getEmployee(int id) {
+        return getSession().get(Employee.class, id);
+    }
+
+    @Override
+    @Transactional
+    public void updateEmployee(Employee emp) {
+        getSession().update(emp);
+    }
+
+    @Override
+    @Transactional
+    public void deleteEmployee(int id) {
+        Employee emp = getEmployee(id);
+        if (emp != null) {
+            getSession().delete(emp);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Employee> getAllEmployees() {
+        return getSession().createQuery("from Employee", Employee.class).list();
+    }
+}
+
+Main. Java 
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Create
+        Employee emp1 = new Employee();
+        emp1.setId(1);
+        emp1.setName("Ali");
+        emp1.setSalary(50000);
+        dao.saveEmployee(emp1);
+
+        // Read
+        Employee e = dao.getEmployee(1);
+        System.out.println("Fetched: " + e);
+
+        // Update
+        e.setSalary(60000);
+        dao.updateEmployee(e);
+        System.out.println("Updated: " + dao.getEmployee(1));
+
+        // Delete
+        dao.deleteEmployee(1);
+        System.out.println("Deleted Employee with ID 1");
+
+        // Insert multiple and get all
+        Employee e2 = new Employee(); e2.setId(2); e2.setName("Sara"); e2.setSalary(70000);
+        Employee e3 = new Employee(); e3.setId(3); e3.setName("Ahmed"); e3.setSalary(80000);
+        dao.saveEmployee(e2);
+        dao.saveEmployee(e3);
+
+        List<Employee> list = dao.getAllEmployees();
+        System.out.println("All Employees:");
+        for (Employee emp : list) {
+            System.out.println(emp);
+        }
+    }
+}

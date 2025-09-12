@@ -1,0 +1,950 @@
+1.wreite a spring configuration program for autowiring byName
+
+Emp.java
+
+package pawase;
+
+public class Emp {
+
+private Address address;
+
+public Address getAddress() {
+	return address;
+}
+
+public void setAddress(Address address) {
+	this.address = address;
+}
+public void show()
+{
+	address.show();System.out.println(address);
+}
+
+}
+
+
+Address.java
+
+package pawase;
+
+public class Address {
+	private int pincode;
+	private String city;
+	private String state;
+
+	public int getPincode() {
+		return pincode;
+	}
+
+	public void setPincode(int pincode) {
+		this.pincode = pincode;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public void show()
+	{
+		System.out.println(pincode);
+		System.out.println(city);
+		System.out.println(state);
+	}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Emp e=(Emp)context.getBean("e1");
+		e.show();
+	}
+
+}
+
+
+cnfig.xml
+
+<beans>
+<context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+ 
+    <bean id="address" class="pawase.Address">
+    <property name="pincode">
+    <value> 422605</value>
+    </property>
+    
+    <property name="city">
+    <value> sangmner</value>
+    </property>
+    
+    <property name="state">
+    <value> maharastra</value>
+    </property>
+    </bean>
+ <bean class="pawase.Emp" name="e1" autowire="byName">
+</bean>
+</beans>
+
+
+2.wreite a spring configuration program for autowiring byType
+
+Emp.java
+
+package pawase;
+
+public class Emp {
+
+private Address address;
+
+public Address getAddress() {
+	return address;
+}
+
+public void setAddress(Address address) {
+	this.address = address;
+}
+public void show()
+{
+	address.show();System.out.println(address);
+}
+
+}
+
+
+Address.java
+
+package pawase;
+
+public class Address {
+	private int pincode;
+	private String city;
+	private String state;
+
+	public int getPincode() {
+		return pincode;
+	}
+
+	public void setPincode(int pincode) {
+		this.pincode = pincode;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public void show()
+	{
+		System.out.println(pincode);
+		System.out.println(city);
+		System.out.println(state);
+	}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Emp e=(Emp)context.getBean("e1");
+		e.show();
+	}
+
+}
+
+cnfig.xml
+
+<beans>
+<context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+ 
+    <bean id="address" class="pawase.Address">
+    <property name="pincode">
+    <value> 111213</value>
+    </property>
+    
+    <property name="city">
+    <value> pune</value>
+    </property>
+    
+    <property name="state">
+    <value> maharastra</value>
+    </property>
+    </bean>
+ <bean class="pawase.Emp" name="e1" autowire="byName">
+</bean>
+
+
+3.wreite a spring configuration program for autowiring constructor
+
+
+
+Emp.java
+
+package pawase;
+
+public class Emp {
+
+private Address address;
+
+public Address getAddress() {
+	return address;
+}
+
+public void setAddress(Address address) {
+	this.address = address;
+}
+public void show()
+{
+	address.show();System.out.println(address);
+}
+
+}
+
+
+Address.java
+
+package pawase;
+
+public class Address {
+	private int pincode;
+	private String city;
+	private String state;
+
+	public int getPincode() {
+		return pincode;
+	}
+
+	public void setPincode(int pincode) {
+		this.pincode = pincode;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public void show()
+	{
+		System.out.println(pincode);
+		System.out.println(city);
+		System.out.println(state);
+	}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Emp e=(Emp)context.getBean("e1");
+		e.show();
+	}
+
+}
+
+cnfig.xml
+
+<beans>
+<context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+ 
+    <bean id="address" class="pawase.Address">
+    <property name="pincode">
+    <value>203040</value>
+    </property>
+    
+    <property name="city">
+    <value> nashik</value>
+    </property>
+    
+    <property name="state">
+    <value> maharastra</value>
+    </property>
+    </bean>
+ <bean class="pawase.Emp" name="e1" autowire="constructor">
+</bean>
+
+4.write a program for bean defination inheritance by using setter method
+Helloindia .java
+
+
+package pawase;
+
+public class Helloindia {
+	private String message1;
+	private String message2;
+	private String message3;
+	public String getMessage1() {
+		return message1;
+	}
+	public void setMessage1(String message1) {
+		this.message1 = message1;
+	}
+	public String getMessage2() {
+		return message2;
+	}
+	public void setMessage2(String message2) {
+		this.message2 = message2;
+	}
+	public String getMessage3() {
+		return message3;
+	}
+	public void setMessage3(String message3) {
+		this.message3 = message3;
+	}
+	public void display()
+	{
+		System.out.println(message1);
+		System.out.println(message2);
+		System.out.println(message3);
+	}}
+
+Helloword .java
+
+package pawase;
+
+public class Helloword {
+private String message1;
+private String message2;
+
+public String getMessage1() {
+	return message1;
+}
+public void setMessage1(String message1) {
+	this.message1 = message1;
+}
+public String getMessage2() {
+	return message2;
+}
+public void setMessage2(String message2) {
+	this.message2 = message2;
+}
+
+
+public void display()
+{
+	System.out.println(message1);
+	System.out.println(message2);
+	
+}
+}
+
+Test .java
+
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Helloindia hi=(Helloindia)context.getBean("hi1");
+		hi.display();
+	}
+
+}
+
+config.xml
+
+<xml>
+ <context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+     
+     
+ <bean class="pawase.Helloword" name="hw1" abstract="true">
+    <property name="message1">
+    <value>vaibhav pawase</value>
+    </property>
+    
+    <property name="message2">
+    <value>hiwergoan pawasa</value>
+    </property>
+    
+ </bean>
+ 
+ 
+    <bean id="hi1" class="pawase.Helloindia" parent="hw1">
+   
+    <property name="message1">
+    <value>vaibhav pawase</value>
+    </property>
+    
+    <property name="message3">
+    <value>sangmner </value>
+    </property>
+    </bean>
+</beans>
+
+
+5.write a spring program for bean defination inheritance by using constructor
+
+Emp .java
+
+package pawase;
+
+public class Emp {
+
+private int id;
+private String name;
+private Address address;
+
+
+public Emp(int id, String name) {
+	super();
+	this.id = id;
+	this.name = name;
+}
+
+
+public Emp(int id, String name, Address address) {
+	super();
+	this.id = id;
+	this.name = name;
+	this.address = address;
+}
+void show()
+{
+	
+	System.out.println(id);
+	System.out.println(name);
+	System.out.println(address);
+	address.show();
+}
+
+}
+
+Address .java
+
+
+package pawase;
+
+public class Address {
+	private String village;
+	private String city;
+	private String state;
+
+	
+	
+
+	public Address(String village, String city, String state) {
+		super();
+		this.village = village;
+		this.city = city;
+		this.state = state;
+	}
+
+
+
+
+	public void show()
+	{
+		System.out.println(village);
+		System.out.println(city);
+		System.out.println(state);
+	}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Emp  e=(Emp)context.getBean("e2",Emp.class);
+		e.show();
+	}
+
+}
+
+
+config.xml
+
+<beans>
+ <context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+     
+     
+ <bean id="e1" class="pawase.Emp">
+ <constructor-arg value="101"></constructor-arg>
+ <constructor-arg value="vaibhav"></constructor-arg>
+ </bean>
+  <bean id="a1" class="pawase.Address" >
+  <constructor-arg value="hiwergoan pawasa"/>
+  <constructor-arg value="sangmner"/>
+  <constructor-arg value="maharastra"/>
+  </bean>
+  
+  <bean id="e2" class="pawase.Emp" parent="e1">
+  <constructor-arg ref="a1"/>
+  </bean>
+</beans>
+
+
+6.write a spring program for @Autowired annotation setter method
+Animal .java
+
+
+package pawase;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class Animal {
+private Dog dog;
+
+public Dog getDog() {
+	return dog;
+}
+@Autowired
+public void setDog(Dog dog) {
+	System.out.println("autowiring on setter method");
+	this.dog = dog;
+}
+public void show()
+{
+	dog.walk();
+}
+
+}
+
+
+Dog.java
+
+package pawase;
+
+public class Dog {
+
+	public Dog() {
+		super();
+		System.out.println("dog constructor");
+	}
+	public void walk()
+	{
+		System.out.println("dog is waking");	
+	}
+
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Animal  a=(Animal)context.getBean("a2",Animal.class);
+		a.show();
+	}
+
+}
+
+
+cinfig.xml
+
+<beans>
+
+     <context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+     
+     
+ <bean id="a2" class="pawase.Animal"/>
+ <bean id="d1" class="pawase.Dog"/>
+ 
+ </beans>
+
+7.write a spring program for @Autowired annotation  on constructor
+
+Mobaile .java
+
+
+package pawase;
+
+public class Mobaile {
+
+	public Mobaile() {
+		super();
+		System.out.println("i am in mobaile constructor");
+		
+	}
+	
+	public void show()
+	{
+		System.out.println("inside show method");
+	}
+
+}
+
+
+Sim.java
+
+package pawase;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class Sim {
+private Mobaile mobaile;
+@Autowired
+public Sim(Mobaile mobaile) {
+	System.out.println("autowiring on constructor");
+	
+	this.mobaile = mobaile;
+}
+public void display()
+{
+	mobaile.show();
+}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Sim  a=(Sim)context.getBean("s2",Sim.class);
+		a.display();;
+	}
+
+}
+
+
+config.Xml
+
+<beans>
+
+     <context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+     
+     
+ <bean id="s2" class="pawase.Sim"/>
+ <bean id="m1" class="pawase.Mobaile"/>
+ 
+ </beans>
+
+8..write a spring program for @Autowired annotation  on properties
+Teacher .java
+
+
+package pawase;
+
+import pawase.Subject;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class Teacher {
+@Autowired
+	private Subject subject;
+
+public Teacher() {
+System.out.println("teacher constructor");
+}
+
+public Subject getSubject() {
+	return subject;
+}
+
+public void setSubject(Subject subject) {
+	this.subject = subject;
+}
+
+public void show()
+{
+	subject.display();
+}
+
+}
+
+Subject.java
+
+package pawase;
+
+public class Subject {
+
+	public Subject() {
+		System.out.println("this is subject constructor");
+		
+	}
+void display()
+{
+	System.out.println("this is subject dispaly method");	
+}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Teacher  s=(Teacher)context.getBean("T2",Teacher.class);
+		s.show();
+	}
+
+}
+
+
+congig.xml
+
+<beans>
+
+
+     <context:annotation-config/>
+ 
+     <context:component-scan base-package="base.package"/>
+     
+     
+ <bean id="T2" class="pawase.Teacher"/>
+ <bean id="s1" class="pawase.Subject"/>
+ 
+ </beans>
+
+9.write a spring program for @Qualifier annotation
+
+Teacher,java
+
+package pawase;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class Teacher {
+private int id;
+private String name;
+private String subject;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getName() {
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+public String getSubject() {
+	return subject;
+}
+public void setSubject(String subject) {
+	this.subject = subject;
+}
+
+}
+
+Profile.java
+
+package pawase;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+public class Profile {
+@Autowired
+@Qualifier("T2")
+private Teacher teacher;
+
+public Profile() {
+	System.out.println("inside profile constructor");
+	
+}
+public void printAge()
+{
+	System.out.println(teacher.getId());
+}
+
+public void printname()
+{
+	System.out.println(teacher.getName());
+	
+}
+
+public void printsubject()
+{
+	
+	
+	System.out.println(teacher.getSubject());	
+}
+
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Profile  p=(Profile)context.getBean("p2",Profile.class);
+		p.printAge();
+		p.printname();
+		p.printsubject();
+	}
+
+}
+
+
+config.xml
+
+<beans>
+
+<context:annotation-config/>
+ 
+     <context:component-scan base-package="pawase"/>
+     
+     
+ <bean id="p2" class="pawase.Profile"/>
+ <bean id="T2" class="pawase.Teacher">
+ <property name="id" value="101"/>
+  <property name="name" value="pawase vaibhav"/>
+   <property name="subject" value="java"/>
+ </bean>
+ 
+ </beans>
+
+
+
+10.write a spring program stereotype annotation using @Component @Value annotation
+
+Studentprofile .java
+package pawase;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+@Component("sp")
+class Studentprofile {
+@Value("Suraj awari")
+	private String sname;
+@Value("111213")
+private int prn_no;
+
+public void show()
+{
+	System.out.println(sname);
+	System.out.println(prn_no);
+}
+}
+
+
+test.java
+
+package pawase;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Studentprofile  s=(Studentprofile)context.getBean("sp",Studentprofile.class);
+		s.show();
+	}
+
+}
+
+
+config.java
+
+<beans>
+
+     <context:annotation-config/>
+ 
+     <context:component-scan base-package="pawase"/>
+ 
+ </beans>
+

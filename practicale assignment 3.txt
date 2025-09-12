@@ -1,0 +1,562 @@
+1.write a spring DAO program for JDBCTempate class and simply create table employee wuth values(ID ,Name,Salary).
+
+Pom.xml
+
+
+
+<dependencies>
+    <!-- Spring JDBC -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Spring Context -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>5.3.30</version>
+    </dependency>
+
+    <!-- Database Driver (PostgreSQL example) -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.3</version>
+    </dependency>
+</dependencies>
+
+applicationContext.xml
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- DataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/mydb"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!-- JdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- DAO Bean -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+</beans>
+
+
+Employee.java
+
+package com.example.model;
+
+public class Employee {
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+}
+
+
+EmployeeDAO.java (Interface)
+
+package com.example.dao;
+
+import com.example.model.Employee;
+
+public interface EmployeeDAO {
+    void createTable();
+    void insertEmployee(Employee emp);
+}
+
+
+EmployeeDAOImpl.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private JdbcTemplate jdbcTemplate;
+
+    // setter for injection
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // Create table
+    @Override
+    public void createTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS employee (" +
+                     "id INT PRIMARY KEY, " +
+                     "name VARCHAR(50), " +
+                     "salary NUMERIC(10,2))";
+        jdbcTemplate.execute(sql);
+        System.out.println("Table created successfully!");
+    }
+
+    // Insert employee
+    @Override
+    public void insertEmployee(Employee emp) {
+        String sql = "INSERT INTO employee (id, name, salary) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, emp.getId(), emp.getName(), emp.getSalary());
+        System.out.println("Inserted: " + emp.getName());
+    }
+}
+
+Main.java
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Create table
+        dao.createTable();
+
+        // Insert sample data
+        Employee e1 = new Employee();
+        e1.setId(1);
+        e1.setName("John");
+        e1.setSalary(50000);
+        dao.insertEmployee(e1);
+
+        Employee e2 = new Employee();
+        e2.setId(2);
+        e2.setName("Alice");
+        e2.setSalary(60000);
+        dao.insertEmployee(e2);
+    }
+}
+
+
+
+2.write a spring DAO program for Binding variable in spring JDBC
+
+Employee.java
+
+package com.example.model;
+
+public class Employee {
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+}
+
+
+EmployeeDAO.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+
+public interface EmployeeDAO {
+    void insertEmployee(Employee emp);
+}
+
+
+EmployeeDAOImpl.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private JdbcTemplate jdbcTemplate;
+
+    // setter injection
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void insertEmployee(Employee emp) {
+        // binding variables using ?
+        String sql = "INSERT INTO employee (id, name, salary) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, emp.getId(), emp.getName(), emp.getSalary());
+
+        System.out.println("Inserted Employee: " + emp.getName());
+    }
+}
+
+
+apllicationContext.xmll
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- DataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/mydb"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!-- JdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Employee DAO -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+</beans>
+
+Main.Java
+
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // create employee object
+        Employee emp = new Employee();
+        emp.setId(101);
+        emp.setName("Vaibhav");
+        emp.setSalary(55000);
+
+        // insert using binding variables
+        dao.insertEmployee(emp);
+    }
+}
+
+
+
+3.write a spring DAO progrsm for mapping database rows to java class by using RowMapper<T>interface
+
+Employee.java
+
+package com.example.model;
+
+public class Employee {
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+
+    @Override
+    public String toString() {
+        return "Employee [id=" + id + ", name=" + name + ", salary=" + salary + "]";
+    }
+}
+
+EmployeeDAO.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import java.util.List;
+
+public interface EmployeeDAO {
+    Employee getEmployeeById(int id);
+    List<Employee> getAllEmployees();
+}
+
+
+EmployeeDAOImpl.java
+
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private JdbcTemplate jdbcTemplate;
+
+    // setter injection
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // RowMapper Implementation (maps DB row -> Employee object)
+    private static class EmployeeRowMapper implements RowMapper<Employee> {
+        @Override
+        public Employee mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Employee emp = new Employee();
+            emp.setId(rs.getInt("id"));
+            emp.setName(rs.getString("name"));
+            emp.setSalary(rs.getDouble("salary"));
+            return emp;
+        }
+    }
+
+    @Override
+    public Employee getEmployeeById(int id) {
+        String sql = "SELECT * FROM employee WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, new EmployeeRowMapper());
+    }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        String sql = "SELECT * FROM employee";
+        return jdbcTemplate.query(sql, new EmployeeRowMapper());
+    }
+}
+
+
+applicationContext.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- DataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/mydb"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!-- JdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Employee DAO -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+</beans>
+
+Main.java
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.List;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Fetch one employee
+        Employee e = dao.getEmployeeById(1);
+        System.out.println("Single Employee: " + e);
+
+        // Fetch all employees
+        List<Employee> list = dao.getAllEmployees();
+        System.out.println("All Employees:");
+        for (Employee emp : list) {
+            System.out.println(emp);
+        }
+    }
+}
+
+
+4.write a spring DAO program for JDBCBatchProcessing using executeBatch()method
+
+Employee.Java
+
+package com.example.model;
+
+public class Employee {
+    private int id;
+    private String name;
+    private double salary;
+
+    // getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
+}
+
+
+EmployeeDAO.java
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import java.util.List;
+
+public interface EmployeeDAO {
+    void insertEmployeesBatch(List<Employee> employees);
+}
+
+
+EmployeeDAOImpl.java
+
+
+package com.example.dao;
+
+import com.example.model.Employee;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
+public class EmployeeDAOImpl implements EmployeeDAO {
+    private JdbcTemplate jdbcTemplate;
+
+    // Setter for dependency injection
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void insertEmployeesBatch(final List<Employee> employees) {
+        String sql = "INSERT INTO employee (id, name, salary) VALUES (?, ?, ?)";
+
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                Employee emp = employees.get(i);
+                ps.setInt(1, emp.getId());
+                ps.setString(2, emp.getName());
+                ps.setDouble(3, emp.getSalary());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return employees.size();
+            }
+        });
+
+        System.out.println("Batch Insert Completed!");
+    }
+}
+
+
+applicationContext.xml
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- DataSource -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="url" value="jdbc:postgresql://localhost:5432/mydb"/>
+        <property name="username" value="postgres"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!-- JdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Employee DAO -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+</beans>
+
+Main.Java
+
+package com.example;
+
+import com.example.dao.EmployeeDAO;
+import com.example.model.Employee;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class App {
+    public static void main(String[] args) {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        EmployeeDAO dao = (EmployeeDAO) ctx.getBean("employeeDAO");
+
+        // Prepare employee list
+        List<Employee> employees = new ArrayList<>();
+
+        Employee e1 = new Employee(); e1.setId(1); e1.setName("Ali"); e1.setSalary(45000);
+        Employee e2 = new Employee(); e2.setId(2); e2.setName("Sara"); e2.setSalary(55000);
+        Employee e3 = new Employee(); e3.setId(3); e3.setName("Ahmed"); e3.setSalary(60000);
+
+        employees.add(e1);
+        employees.add(e2);
+        employees.add(e3);
+
+        // Batch insert
+        dao.insertEmployeesBatch(employees);
+    }
+}
+
+
+
+
