@@ -1,0 +1,416 @@
+1.writeva spring program for dependancy injection bu using constructor with <constructor-arg tag> tag
+
+Student.java
+
+package pawase;
+
+public class Student {
+private int id;
+private String name;
+public Student(int id, String name) {
+	super();
+	this.id = id;
+	this.name = name;
+}
+public void show()
+{
+	System.out.println(id);
+	System.out.println(name);
+}
+}
+
+Test.java
+
+
+package pawase;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Student s=(Student)context.getBean("s1");
+		s.show();
+	}
+
+}
+
+
+
+config.java
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+               http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+               http://www.springframework.org/schema/context
+               http://www.springframework.org/schema/context/spring-context.xsd">
+               
+         <bean class="pawase.Student" id="s1">
+			 	<constructor-arg value="10"></constructor-arg>
+			 	<constructor-arg value="vaibhav"></constructor-arg>
+         </bean>      
+               
+  </beans>
+
+2.write a spring program for object coupling problem using tight coupling
+
+Engine.java
+
+
+package pawase;
+
+public class Engine {
+public void start()
+{
+	System.out.println("engine is start....");
+}
+}
+
+Car.java
+
+package pawase;
+
+public class Car {
+private Engine engine;
+
+public Car() {
+	super();
+	engine=new Engine();
+}
+
+public void drive()
+{
+	engine.start();
+	System.out.println("car is moving...");
+}
+
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Car car=(Car)context.getBean("car");
+	car.drive();
+	}
+
+}
+
+
+congig.xml
+<beans>
+ <bean class="pawase.Car" id="car">
+			 	
+         </bean>      
+               
+  </beans>
+
+
+
+
+3.write a bean program to implement bean life cycle by using xml
+
+Student.java
+
+package pawase;
+
+public class Student {
+public void init()
+{
+	System.out.println("init method called");
+}
+
+public void destroy()
+{
+	System.out.println("destroy method called");
+}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		AbstractApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Student s=(Student)context.getBean("s1");
+		context.registerShutdownHook();
+	}
+
+}
+
+
+config.xml
+
+
+<beans>
+  <bean class="pawase.Student" id="s1" init-method="init" destroy-method="destroy"/>
+
+  </beans>
+
+
+4.write a java program for bean scope using prototypackage pawase;
+Prototype.java
+
+
+public class Prototype {
+private String message;
+
+public String getMessage() {
+	return message;
+}
+
+public void setMessage(String message) {
+	this.message = message;
+}
+
+public void display()
+{
+	System.out.println(message);
+}
+}
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Prototype p=(Prototype)context.getBean("p1");
+		p.display();
+	}
+
+}
+
+
+coonfig.java
+
+<beans>
+<bean id="p1" class="pawase.Prototype" scope="prototype">
+    <property name="message">
+    <value>prototype scpoe  object created</value>
+    </property>
+    </bean>
+ 
+</beans>
+
+
+5.write a spring program for DI by using seeter with <property> tag
+
+Emp.java
+
+
+package pawase;
+
+public class Emp {
+private int id;
+private String name;
+private float salary;
+public int getId() {
+	return id;
+}
+public void setId(int id) {
+	this.id = id;
+}
+public String getName() {
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+public float getSalary() {
+	return salary;
+}
+public void setSalary(float salary) {
+	this.salary = salary;
+}
+public void show()
+{
+	System.out.println(id);
+	System.out.println(name);
+	System.out.println(salary);
+}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Emp e=(Emp)context.getBean("e1");
+		e.show();
+	}
+
+}
+
+
+config.java
+
+<beans>
+ <bean id="e1" class="pawase.Emp" >
+    <property name="id">
+    <value>11</value>
+    </property>
+    
+    <property name="name">
+    <value>pawase vaibhav</value>
+    </property>
+    
+    <property name="salary">
+    <value>150000</value>
+    </property>
+    </bean>
+ 
+</beans>
+
+5.wr write a spring program to implement bean life cycle by using annotation 
+
+
+// MyBean.java
+package com.example;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+
+public class MyBean {
+
+    public MyBean() {
+        System.out.println("Bean Constructor: MyBean object created");
+    }
+
+    @PostConstruct
+    public void init() {
+        System.out.println("Bean Init: @PostConstruct method called");
+    }
+
+    public void doWork() {
+        System.out.println("Bean is working...");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.out.println("Bean Destroy: @PreDestroy method called");
+    }
+}
+
+// AppConfig.java
+package com.example;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public MyBean myBean() {
+        return new MyBean();
+    }
+}
+
+// MainApp.java
+package com.example;
+
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class MainApp {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(AppConfig.class);
+
+        MyBean bean = context.getBean(MyBean.class);
+        bean.doWork();
+
+        // Closing context will call @PreDestroy
+        context.close();
+    }
+}
+
+
+6.write a spring program for bean scope using singleton
+
+Singletone .java
+
+package pawase;
+
+public class Singletone {
+	private String message;
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void display()
+	{
+		System.out.println(message);
+	}
+}
+
+
+Test.java
+
+package pawase;
+
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class Test {
+
+	public static void main(String[] args) {
+		ConfigurableApplicationContext context=new ClassPathXmlApplicationContext("config.xml");
+		Singletone s=(Singletone)context.getBean("s1");
+		s.display();;
+	}
+
+}
+
+
+config.xml
+
+<beans>
+  <bean id="s1" class="pawase.Singletone" scope="singleton">
+    <property name="message">
+    <value>Singleton scpoe  object created</value>
+    </property>
+    </bean>
+ 
+</beans>
+
+7.write a spring program for implementing life cycle by using annotation
+
+
+
